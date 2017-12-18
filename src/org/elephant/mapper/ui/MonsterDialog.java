@@ -40,6 +40,8 @@ public class MonsterDialog extends JDialog {
     private JLabel labelFileName;
     private JTextField codeComment;
     private JTable monIdsTable;
+    private JTable monEmotes;
+    private JTextField monEmoteFreq;
     private Monster monster;
 
     private Monster getMonster() {
@@ -85,6 +87,9 @@ public class MonsterDialog extends JDialog {
             }
 
             ((LpcObjectEditableArrayTable)monIdsTable.getModel()).refresh(monster.getIds());
+            ((LpcObjectEditableArrayTable)monEmotes.getModel()).refresh(monster.getEmotes());
+            monEmoteFreq.setText(String.valueOf(getMonster().getEmoteFrequency()));
+
 
             buttonSave.setEnabled(true);
         } else {
@@ -102,6 +107,8 @@ public class MonsterDialog extends JDialog {
             monPrimaryClass.setSelectedItem("");
             monSecondClass.setSelectedItem("");
             ((LpcObjectEditableArrayTable)monIdsTable.getModel()).reset();
+            ((LpcObjectEditableArrayTable)monEmotes.getModel()).reset();
+            monEmoteFreq.setText("");
 
         }
         updatePreview();
@@ -342,6 +349,63 @@ public class MonsterDialog extends JDialog {
                 updatePreview();
             }
         });
+
+
+        monEmoteFreq.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                super.focusLost(e);
+                if(monEmoteFreq.getText()!=null && monEmoteFreq.getText().length()>0) {
+                    try {
+                        int i = Integer.valueOf(monEmoteFreq.getText());
+                        if (i<1 || i>100) {
+                            throw new Exception();
+                        }
+                        getMonster().setEmoteFrequency(i);
+                    } catch(Exception ex) {
+                        JOptionPane.showMessageDialog(new JFrame(), "Emote Frequency has to be a number " +
+                                        "between 1 and 100.", "Dialog",
+                                JOptionPane.ERROR_MESSAGE);
+                        monEmoteFreq.setText(String.valueOf(getMonster().getEmoteFrequency()));
+                    }
+                }
+            }
+        });
+
+        LpcObjectEditableArrayTable monEmotesTableModel = new LpcObjectEditableArrayTable("Emote");
+        monEmotes.setTableHeader(null);
+        monEmotes.setModel(monEmotesTableModel);
+
+
+        monEmotes.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                super.keyPressed(e);
+                if(e.getKeyCode() == KeyEvent.VK_INSERT ||
+                        (monEmotes.getSelectedRow() == monEmotes.getRowCount()-1) && e.getKeyCode() == KeyEvent.VK_DOWN) {
+                    if(monEmotes.getSelectedRow() == monEmotes.getRowCount()-1) {
+                        monEmotesTableModel.addRow(new String[]{""});
+                    } else {
+                        monEmotesTableModel.insertRow(monEmotes.getSelectedRow(), new String[]{""});
+
+                    }
+                } else if(e.getKeyCode() == KeyEvent.VK_DELETE && monEmotes.getSelectedRow()>=0) {
+                    monEmotesTableModel.removeRow(monEmotes.getSelectedRow());
+//                    table.setRowSelectionInterval(oldRow-1, oldRow-1);
+                }
+            }
+        });
+        monEmotes.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent listSelectionEvent) {
+                List<String> values = monEmotesTableModel.getValues();
+
+                getMonster().setEmotes(values);
+                updatePreview();
+            }
+        });
+
+
         monsterListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent listSelectionEvent) {

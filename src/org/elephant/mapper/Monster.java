@@ -1,7 +1,6 @@
 package org.elephant.mapper;
 
 import freemarker.template.TemplateException;
-import org.jdom.CDATA;
 import org.jdom.Element;
 
 import java.io.BufferedWriter;
@@ -20,6 +19,10 @@ public class Monster extends LpcObject implements Exportable {
     protected static final String XML_LEVEL = "LEVEL";
     protected static final String XML_PRIMARY_CLASS = "PRICLASS";
     protected static final String XML_SECOND_CLASS = "SECCLASS";
+    protected static final String XML_EMOTES = "EMOTES";
+    protected static final String XML_EMOTE = "EMOTE";
+    protected static final String XML_EMOTE_FREQ = "EMOTEFREQ";
+
     private String race = "Human";
     private String bodyType = "Human";
     private String gender = "Neuter";
@@ -54,6 +57,14 @@ public class Monster extends LpcObject implements Exportable {
         monster.addContent(EleUtils.createElement(XML_RACE, getRace()));
         monster.addContent(EleUtils.createElement(XML_PRIMARY_CLASS, getPrimaryClass()));
         monster.addContent(EleUtils.createElement(XML_SECOND_CLASS, String.valueOf(getSecondClass())));
+        monster.addContent(EleUtils.createElement(XML_EMOTE_FREQ, String.valueOf(getEmoteFrequency())));
+
+        Element emotes = new Element(XML_EMOTES);
+
+        for(String emote: getEmotes()) {
+            emotes.addContent(EleUtils.createElement(XML_EMOTE, emote));
+        }
+        monster.addContent(emotes);
         return monster;
     }
 
@@ -117,6 +128,22 @@ public class Monster extends LpcObject implements Exportable {
             tmp = root.getChild(XML_SECOND_CLASS);
             if (tmp != null) {
                 monster.setSecondClass(tmp.getTextTrim());
+            }
+
+
+            tmp = root.getChild(XML_LEVEL);
+            if (tmp != null) {
+                monster.setEmoteFrequency(Integer.valueOf(tmp.getTextTrim()));
+            }
+
+            tmp = root.getChild(XML_EMOTES);
+            if (tmp != null) {
+                List<String> emotes = new ArrayList<>();
+                Iterator iter = tmp.getChildren(XML_EMOTE).iterator();
+                while (iter.hasNext()) {
+                    emotes.add(((Element) iter.next()).getTextTrim());
+                }
+                monster.setEmotes(emotes);
             }
         }
 
@@ -190,11 +217,22 @@ public class Monster extends LpcObject implements Exportable {
         return emotes;
     }
 
+    public List<String> renderEmotes() {
+//        return emotes.stream().map(emote->replace_tokens(emote)).collect(Collectors.toList());
+        List<String> list = new ArrayList<>();
+        for (String emote: emotes) {
+            if(emote!=null) {
+                list.add(replace_tokens(emote));
+            }
+        }
+        return list;
+    }
+
     public void setEmotes(List<String> emotes) {
         this.emotes = emotes;
     }
 
     public void addEmote(String emote) {
-        this.emotes.add(replace_tokens(emote));
+        this.emotes.add(emote);
     }
 }

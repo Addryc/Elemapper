@@ -27,7 +27,7 @@ void create() {
     <#if monster.secondClass!="">
     set_second_class("${monster.secondClass}");
     </#if>
-    <#list monster.emotes>
+    <#list monster.renderEmotes()>
     set_emotes(${monster.emoteFrequency},({
         <#items as emote>"${emote}"<#sep>, </#items>
     }),0);
