@@ -2,6 +2,7 @@ package org.elephant.mapper.ui;
 
 import com.inet.jortho.FileUserDictionary;
 import com.inet.jortho.SpellChecker;
+import com.inet.jortho.SpellCheckerOptions;
 import org.elephant.mapper.EleConstants;
 import org.elephant.mapper.Exportable;
 import org.elephant.mapper.Monster;
@@ -266,6 +267,7 @@ public class MonsterDialog extends JDialog {
             }
         });
 
+        SpellChecker.register(monShort);
         SpellChecker.register(monLong);
 
         genderSelection.addActionListener(new ActionListener() {

@@ -534,6 +534,7 @@ public class RoomTabs extends JTabbedPane {
         txtRoomLongDesc.setLineWrap(true);
         txtRoomLongDesc.setFont(textFont);
 
+        SpellChecker.register(txtRoomShortDesc);
         SpellChecker.register(txtRoomLongDesc);
 
         txtRoomLongDescCopy.setFont(new Font("SansSerif", 0, 12));
@@ -549,9 +550,13 @@ public class RoomTabs extends JTabbedPane {
         txtItemDescription.setLineWrap(true);
         txtItemDescription.setBorder(null);
         txtItemDescription.setFont(textFont);
+        SpellChecker.register(txtItemDescription);
+
         txtSenseDescription.setWrapStyleWord(true);
         txtSenseDescription.setLineWrap(true);
         txtSenseDescription.setFont(textFont);
+        SpellChecker.register(txtSenseDescription);
+
         txtGuardCheckInline.setFont(codeFont);
         txtGuardCheckInline.setPreferredSize(new Dimension(100, 21));
         selGuardCheckFunctions.setPreferredSize(new Dimension(100, 21));
