@@ -1,9 +1,9 @@
 package org.elephant.mapper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import freemarker.template.Configuration;
+import freemarker.template.TemplateExceptionHandler;
+
+import java.io.*;
 import java.util.Properties;
 
 import java.awt.Color;
@@ -21,7 +21,7 @@ public final class EleConstants {
     /** Can't construct this class */
     private EleConstants() {}
 
-    public static final String VERSION              = "1.8";
+    public static final String VERSION              = "2.0";
 
     public static final int DIRECTION_UP            = Room.OUT_UP;
     public static final int DIRECTION_NORTH         = Room.OUT_TOP;
@@ -65,6 +65,7 @@ public final class EleConstants {
     public static final String XML_SMELLS           = "SMELLS";
     public static final String XML_LOADED           = "LOADED";
     public static final String XML_FUNCTIONS        = "FUNCTIONS";
+    public static final String XML_MONSTERS         = "MONSTERS";
 
     public static final int EXIT_OPTION_NO          = 0;
     public static final int EXIT_OPTION_YES         = 1;
@@ -74,11 +75,30 @@ public final class EleConstants {
     public static final String DEFINE_OBJ_PATH      = "OBDIR";
     public static final String DEFINE_MON_PATH      = "MONDIR";
     public static final String DEFINE_ROOM_PATH     = "ROOMDIR";
+    private static boolean initialized = false;
 
     private static File PROPS = new File("EleMapper.properties");
 
+    public static Configuration freeMarkerConfig;
+
     public static void init() {
         try {
+
+            if(initialized) {
+                return;
+            }
+            Configuration cfg = new Configuration(Configuration.VERSION_2_3_27);
+//            cfg.setDirectoryForTemplateLoading(new File("templates"));
+
+            cfg.setClassForTemplateLoading(EleConstants.class, "/templates/");
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+            cfg.setLogTemplateExceptions(false);
+            cfg.setWrapUncheckedExceptions(true);
+            freeMarkerConfig = cfg;
+
+            System.out.println(EleConstants.freeMarkerConfig);
+
             Properties props = new Properties();
             props.load(new FileInputStream(PROPS));
             SELECT_COLOUR = Color.decode(props.getProperty("SELECT_COLOUR", String.valueOf(SELECT_COLOUR.getRGB())));
@@ -87,11 +107,14 @@ public final class EleConstants {
             BACKGROUND_COLOUR = Color.decode(props.getProperty("BACKGROUND_COLOUR", String.valueOf(BACKGROUND_COLOUR.getRGB())));
             LOWER_LEVEL_COLOUR = Color.decode(props.getProperty("LOWER_LEVEL_COLOUR", String.valueOf(LOWER_LEVEL_COLOUR.getRGB())));
             UPPER_LEVEL_COLOUR = Color.decode(props.getProperty("UPPER_LEVEL_COLOUR", String.valueOf(UPPER_LEVEL_COLOUR.getRGB())));
+
         } catch (FileNotFoundException fnfe) {
+            fnfe.printStackTrace();
             // do nothing, we don't care.
         } catch (Exception e) {
             e.printStackTrace();
         }
+        initialized = true;
     }
 
     public static void save() {
@@ -115,5 +138,6 @@ public final class EleConstants {
     public static void setBackGroundColour(Color data) {BACKGROUND_COLOUR = data;}
     public static void setLowerLevelColour(Color data) {LOWER_LEVEL_COLOUR = data;}
     public static void setUpperLevelColour(Color data) {UPPER_LEVEL_COLOUR = data;}
+
 
 }

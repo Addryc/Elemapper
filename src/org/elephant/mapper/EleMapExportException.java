@@ -9,7 +9,7 @@ package org.elephant.mapper;
  * @version 1.0
  */
 public class EleMapExportException extends Exception {
-    private EleMappable _badThing;
+    private Exportable _badThing;
 
     public EleMapExportException() {
     }
@@ -18,12 +18,12 @@ public class EleMapExportException extends Exception {
         super(s);
     }
 
-    public EleMapExportException(String s, EleMappable ob) {
+    public EleMapExportException(String s, Exportable ob) {
         super(s);
         _badThing = ob;
     }
 
-    public EleMappable getErrorObject() {
+    public Exportable getErrorObject() {
         return _badThing;
     }
 }

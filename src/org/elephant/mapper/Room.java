@@ -11,11 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.jdom.CDATA;
 import org.jdom.Element;
@@ -42,6 +38,7 @@ public class Room extends Rectangle implements EleMappable {
     public static final String XML_CODEDESC = "CODEDESC";
     public static final String XML_SHORT = "SHORT";
     public static final String XML_LONG = "LONG";
+    public static final String XML_LONGQUOTES = "LONGQUOTES";
     public static final String XML_LIGHT = "LIGHT";
     public static final String XML_TERRAIN = "TERRAIN";
     public static final String XML_BOUNDARY = "BOUNDARY";
@@ -63,6 +60,7 @@ public class Room extends Rectangle implements EleMappable {
     private String _shortDesc = "";
     private String _roomName = "";
     private String _longDesc = "";
+    private boolean _longDescQuotes = true;
     private String _codeDesc = "";
     private EleExportableCollection<Exportable> _items = new EleExportableCollection<Exportable>(EleConstants.XML_ITEMS);
     private int[] _terrains;
@@ -76,7 +74,22 @@ public class Room extends Rectangle implements EleMappable {
     private String _subdir = "";
     private String _code = "";
 
-    //----------------------------------------------------------
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Room room = (Room) o;
+        return _roomNumber == room._roomNumber;
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(super.hashCode(), _roomNumber);
+    }
+
+//----------------------------------------------------------
     // Accessors/Mutators
     //----------------------------------------------------------
 
@@ -109,6 +122,16 @@ public class Room extends Rectangle implements EleMappable {
 
     public String getLongDescription() {return _longDesc;}
     public void setLongDescription(String data) {_longDesc = data;}
+
+    public boolean isLongDescQuotes() {
+        return _longDescQuotes;
+    }
+
+    public void setLongDescQuotes(boolean _longDescQuotes) {
+        this._longDescQuotes = _longDescQuotes;
+    }
+
+
 
     public String getType() {return XML_ROOM;}
 
@@ -258,6 +281,8 @@ public class Room extends Rectangle implements EleMappable {
                 if (tmp != null) r.setShortDescription(tmp.getTextTrim());
                 tmp = root.getChild(XML_LONG);
                 if (tmp != null) r.setLongDescription(tmp.getText().trim());
+                tmp = root.getChild(XML_LONGQUOTES);
+                if (tmp != null) r.setLongDescQuotes(Boolean.valueOf(tmp.getTextTrim()));
                 tmp = root.getChild(XML_LIGHT);
                 if (tmp != null) r.setLight(Integer.valueOf(tmp.getTextTrim()));
                 tmp = root.getChild(XML_BOUNDARY);
@@ -584,6 +609,7 @@ public class Room extends Rectangle implements EleMappable {
         room.addContent(EleUtils.createElement(XML_CODEDESC, _codeDesc));
         room.addContent(EleUtils.createElement(XML_SHORT, _shortDesc));
         room.addContent(EleUtils.createElement(XML_LONG, _longDesc));
+        room.addContent(EleUtils.createElement(XML_LONGQUOTES, String.valueOf(_longDescQuotes)));
         room.addContent(EleUtils.createElement(XML_LIGHT, String.valueOf(_light)));
         room.addContent(EleUtils.createElement(XML_BOUNDARY, _boundary));
         codeElement = new Element(XML_CODE);
@@ -683,16 +709,32 @@ public class Room extends Rectangle implements EleMappable {
         // Descriptions
         bw.write("    set_short(\""+_shortDesc+"\");\n");
 
-        tmpArray = EleUtils.breakString(EleUtils.replace(_longDesc, "\n", "\\n"), 60);
         bw.write("    set_long(");
-        spacer = "";
-        if (tmpArray.length > 0) {
-            for (final String stringSection : tmpArray) {
-                bw.write(spacer + "\"" + stringSection + "\"");
-                spacer = "\n             ";
+
+        if (_longDescQuotes) {
+            tmpArray = EleUtils.breakString(EleUtils.replace(_longDesc, "\n", "\\n"), 60);
+
+            spacer = "";
+            if (tmpArray.length > 0) {
+                int i = 0;
+                String stringSection = tmpArray[0];
+                bw.write(spacer + (_longDescQuotes?"\"":"") + stringSection + "\"");
+                i++;
+                boolean lastRow = false;
+                if(tmpArray.length>1) {
+                    for (;i<tmpArray.length;i++) {
+                        spacer = "\n             ";
+                        lastRow = (i == tmpArray.length-1);
+                        stringSection = tmpArray[i];
+                        bw.write(spacer + "\"" + stringSection + (!lastRow?"\"":""));
+                    }
+                }
+                bw.write(_longDescQuotes?"\"":"");
+            } else {
+                bw.write("\"\"");
             }
         } else {
-            bw.write("\"\"");
+            bw.write(_longDesc);
         }
         bw.write(");\n");
 

@@ -2,4 +2,5 @@ classes
 out
 LPCGenerated
 EleMapper.iws
-EleMapper.jar
+Elemapper.*
+.idea/

@@ -1,11 +1,16 @@
 package org.elephant.mapper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
 
 import java.awt.Point;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateExceptionHandler;
 import org.jdom.Element;
 
 /**
@@ -237,6 +242,18 @@ public class EleUtils {
             break;
         }
         return newDirection;
+    }
+
+
+    public static String generateFreemarkerFromTemplate(LpcObject obj) throws IOException, TemplateException {
+        EleConstants.init();
+        Map<String, Object> model = new HashMap<>();
+        model.put(obj.getModelName(), obj);
+        Template temp = EleConstants.freeMarkerConfig.getTemplate(obj.getTemplate());
+        StringWriter out = new StringWriter();
+        temp.process(model, out);
+        return out.getBuffer().toString();
+
     }
 }
 

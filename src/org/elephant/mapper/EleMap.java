@@ -31,6 +31,7 @@ public class EleMap implements EleMappable {
 
     private EleMappableCollection<EleMappable> _rooms = new EleMappableCollection<EleMappable>(EleConstants.XML_ROOMS);
     private EleMappableCollection<EleMappable> _exits = new EleMappableCollection<EleMappable>(EleConstants.XML_EXITS);
+    private EleExportableCollection<Monster> _monsters = new EleExportableCollection<>(EleConstants.XML_MONSTERS);
     private int _roomSize = INITIAL_ROOM_SIZE;
     private long _roomNumber = 1;
     private long _exitNumber = 1;
@@ -43,11 +44,27 @@ public class EleMap implements EleMappable {
     // Accessors/Mutators
     //----------------------------------------------------------
 
-    public void setRooms(EleMappableCollection<EleMappable> data) {_rooms = data;}
+    public void setRooms(EleMappableCollection<EleMappable> data) {
+        _rooms = data;
+    }
     public EleMappableCollection<EleMappable> getRooms() {return _rooms;}
 
     public void setExits(EleMappableCollection<EleMappable> data) {_exits = data;}
     public EleMappableCollection<EleMappable> getExits() {return _exits;}
+
+    public EleExportableCollection<Monster> getMonsters() {
+        return _monsters;
+    }
+
+    public void setMonsters(EleExportableCollection<Monster> monsters) {
+        _monsters = monsters;
+    }
+
+    public void addOrUpdateMonster(Monster monster) {
+        if(!_monsters.contains(monster)) {
+            _monsters.add(monster);
+        }
+    }
 
     public void setRoomSize(int data) {_roomSize = data;}
     public int getRoomSize() {return _roomSize;}
@@ -102,6 +119,9 @@ public class EleMap implements EleMappable {
             //Important to rebuild the exits AFTER the rooms, as they rely on them.
             tmp = root.getChild(EleConstants.XML_EXITS);
             if (tmp != null) newMap.setExits(EleMappableCollection.rebuild(newMap, tmp));
+
+            tmp = root.getChild(EleConstants.XML_MONSTERS);
+            if (tmp != null) newMap.setMonsters(Monster.rebuildMonsters(tmp));
         }
 
         return newMap;
@@ -177,12 +197,14 @@ public class EleMap implements EleMappable {
         root.addContent(EleUtils.createElement(XML_PATH, _path));
         root.addContent(_rooms.writeToXML());
         root.addContent(_exits.writeToXML());
+        root.addContent(_monsters.writeToXML());
 
         return root;
     }
 
     public void export(File directory, String path, BufferedWriter bw, String seperator) throws EleMapExportException, IOException {
         File roomsDir = new File(directory.getAbsolutePath() + File.separator + "rooms");
+        File monDir = new File(directory.getAbsolutePath() + File.separator + "mon");
         File includeDir = new File(directory.getAbsolutePath() + File.separator + "include");
         File includes = new File(includeDir.getAbsolutePath() + File.separator + "include.h");
 
@@ -194,6 +216,10 @@ public class EleMap implements EleMappable {
 
         if (!includeDir.exists()) {
             includeDir.mkdir();
+        }
+
+        if (!monDir.exists()) {
+            monDir.mkdir();
         }
 
         if (includes.exists()) {
@@ -218,11 +244,14 @@ public class EleMap implements EleMappable {
         bw.close();
 
         _rooms.export(roomsDir, path + "rooms/", bw, seperator);
+
+        _monsters.export(monDir, path+"mon/", bw, seperator);
     }
 
     public void checkForExport() throws EleMapExportException {
         _rooms.checkForExport();
         _exits.checkForExport();
+        _monsters.checkForExport();
     }
 
     //----------------------------------------------------------

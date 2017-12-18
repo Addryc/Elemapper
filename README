@@ -1,6 +1,16 @@
 Elemapper Updates
 
 ===================================================================
+Version 2.0 - Nov 2011 - Jazz@Elephant
+===================================================================
+
+Add support for Monster Manager - Create and add Monsters
+Add support for multi-click operations on rooms
+Add support for freemarker-based templates for LPC-generated files
+Add support for 'exact match' descriptions - UN-check the 'Quotes/Wrap' checkbox
+
+
+===================================================================
 Version 1.8 - Nov 2011
 ===================================================================
 

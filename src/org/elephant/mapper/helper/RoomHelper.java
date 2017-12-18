@@ -3,6 +3,8 @@ package org.elephant.mapper.helper;
 import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.List;
+import java.util.Stack;
 
 import org.elephant.mapper.Room;
 import org.elephant.mapper.Item;
@@ -16,20 +18,52 @@ import org.elephant.mapper.Function;
  * @author UKJamesCook
  */
 public class RoomHelper {
-    private Room currentRoom;
+    private List<Room> selectedRooms = new ArrayList<>();
     private Room copiedRoom;
 
-    public Room getRoom() {
-        return currentRoom;
+    public Room getSelectedRoom() {
+        return selectedRooms.get(0);
     }
 
-    public void setRoom(Room room) {
-        currentRoom = room;
+    public void addSelectedRoom(Room room) {
+//        System.out.println("Add Selected Room: "+ room.toString());
+        selectedRooms.add(room);
+//        System.out.println("Rooms after add: "+selectedRooms);
     }
 
-    public boolean hasRoom() {
-        return currentRoom != null;
+    public void removeSelectedRoom(Room room) {
+//        System.out.println("Remove Selected Room: "+ room.toString());
+        selectedRooms.remove(room);
+//        System.out.println("Rooms after removal: "+selectedRooms);
+
     }
+
+    public boolean isRoomSelected(Room room) {
+        return selectedRooms.contains(room);
+    }
+
+    public List<Room> getSelectedRooms() {
+  //      System.out.println("Selected Rooms: "+selectedRooms);
+        return selectedRooms;
+    }
+
+    public void clearSelectedRooms() {
+        selectedRooms.clear();
+    }
+
+    public boolean hasRoomSelected() {
+        return selectedRooms.size()>0;
+    }
+
+    public boolean hasSingleRoomSelected() {
+        return selectedRooms.size() == 1;
+    }
+
+    public boolean hasMultipleRoomSelected() {
+        return selectedRooms.size() > 1;
+    }
+
+
 
     public Room getCopiedRoom() {
         return copiedRoom;
@@ -40,30 +74,30 @@ public class RoomHelper {
     }
 
     public void createCopyRoom(int roomSize, long roomNumber) {
-        if (hasRoom()) {
-            copiedRoom = currentRoom.clone(roomSize, roomNumber);
+        if (hasSingleRoomSelected()) {
+            copiedRoom = getSelectedRooms().get(0).clone(roomSize, roomNumber);
         }
     }
 
     public void updateCurrentRoomWithCopiedRoom() {
-        if (hasRoom() && hasCopiedRoom()) {
-            currentRoom.update(copiedRoom);
+        if (hasRoomSelected() && hasCopiedRoom()) {
+            for(Room room: getSelectedRooms()) {
+                room.update(copiedRoom);
+            }
         }
     }
 
     public void makeCopiedRoomTheCurrentRoom() {
-        currentRoom = copiedRoom;
-    }
-
-    public void clearRoom() {
-        setRoom(null);
+        clearSelectedRooms();
+        addSelectedRoom(copiedRoom);
     }
 
     public void deSelect(Graphics g, long level, boolean showUpper, boolean showLower) {
-        if (hasRoom()) {
-            currentRoom.deSelect(g, level, showUpper, showLower);
-            clearRoom();
+//        System.out.println(("DeSelect"));
+        for(Room room: getSelectedRooms()) {
+            room.deSelect(g, level, showUpper, showLower);
         }
+        clearSelectedRooms();
     }
 
     public void addItem(ArrayList<String> itemNames, String description) {
@@ -71,25 +105,27 @@ public class RoomHelper {
         Item item;
         boolean found = false;
         if (itemNames.size() > 0) {
-            for (i = 0; i < currentRoom.getItems().size(); i++) {
-                if (currentRoom.getItem(i).containsNames(itemNames)) {
-                    found = true;
-                    break;
+            for (Room room: getSelectedRooms()) {
+                for (i = 0; i < room.getItems().size(); i++) {
+                    if (room.getItem(i).containsNames(itemNames)) {
+                        found = true;
+                        break;
+                    }
+                }
+                item = new Item(itemNames, description);
+                if (found) {
+                    room.getItems().set(i, item);
+                } else {
+                    room.getItems().add(item);
                 }
             }
 
-            item = new Item(itemNames, description);
-            if (found) {
-                currentRoom.getItems().set(i, item);
-            } else {
-                currentRoom.getItems().add(item);
-            }
         }
     }
 
     public void removeItem(int index) {
-        if (index > -1) {
-            currentRoom.getItems().remove(index);
+        if (index > -1 && hasSingleRoomSelected()) {
+            getSelectedRooms().get(0).getItems().remove(index);
         }
     }
 
@@ -101,9 +137,11 @@ public class RoomHelper {
         }
     }
 
-    public void addObject(String fileName, boolean loadPresent, boolean loadTrack, boolean loadUnique, boolean isMonster, String enterMessage) {
+    public void addObject(String fileName, boolean loadPresent, boolean loadTrack, boolean loadUnique,
+                          boolean isMonster, String enterMessage, String uuid) {
         int loadType = 0;
         LoadedObject obj;
+        LoadedObject old = null;
         boolean found = false;
         int i;
         EleExportableCollection<Exportable> loadedObjects;
@@ -119,19 +157,27 @@ public class RoomHelper {
 
             obj = new LoadedObject((isMonster ?LoadedObject.OBJECT_TYPE_MON:LoadedObject.OBJECT_TYPE_OBJ),
                                    loadType, fileName, enterMessage);
-
-            loadedObjects = currentRoom.getLoadedObjects();
-            for (i = 0; i < loadedObjects.size(); i++) {
-                if (((LoadedObject) loadedObjects.get(i)).getFileName().equals(fileName)) {
-                    found = true;
-                    break;
+            obj.setUuid(uuid);
+            for(Room room: getSelectedRooms()) {
+                loadedObjects = room.getLoadedObjects();
+                for (i = 0; i < loadedObjects.size(); i++) {
+                    if (((LoadedObject) loadedObjects.get(i)).getFileName().equals(fileName)) {
+                        found = true;
+                        old = (LoadedObject) loadedObjects.get(i);
+                        break;
+                    }
                 }
-            }
 
-            if (found) {
-                loadedObjects.set(i, obj);
-            } else {
-                loadedObjects.add(obj);
+                if (found) {
+                    // Persist UUID if its already set
+                    if (old != null && old.getUuid()!=null) {
+                        obj.setUuid(old.getUuid());
+                    }
+                    loadedObjects.set(i, obj);
+                } else {
+                    loadedObjects.add(obj);
+                }
+
             }
         }
     }
@@ -146,7 +192,7 @@ public class RoomHelper {
 
             function = new Function(returnType, functionName, arguments, body);
 
-            functions = currentRoom.getFunctions();
+            functions = getSelectedRoom().getFunctions();
             for (i = 0; i < functions.size(); i++) {
                 if (((Function) functions.get(i)).getName().equals(functionName)) {
                     found = true;
@@ -163,21 +209,23 @@ public class RoomHelper {
     }
 
     public void removeObject(LoadedObject object) {
-        currentRoom.getLoadedObjects().remove(object);
+        getSelectedRoom().getLoadedObjects().remove(object);
     }
 
     public void removeFunction(Function function) {
-        currentRoom.getFunctions().remove(function);
+        getSelectedRoom().getFunctions().remove(function);
     }
 
     public void setColour(Color c) {
-        if (hasRoom()) {
-            currentRoom.setColour(c);
+        if (hasRoomSelected()) {
+            for(Room room: getSelectedRooms()) {
+                room.setColour(c);
+            }
         }
     }
 
     public EleHashtable currentSense(boolean smells, boolean sounds) {
-        return currentSense(smells, sounds, getRoom());
+        return currentSense(smells, sounds, getSelectedRoom());
     }
 
     public static EleHashtable currentSense(boolean smells, boolean sounds, Room room) {

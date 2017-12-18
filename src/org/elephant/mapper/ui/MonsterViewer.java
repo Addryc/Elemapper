@@ -1,9 +1,6 @@
 package org.elephant.mapper.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Font;
+import java.awt.*;
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -48,10 +45,17 @@ public class MonsterViewer extends JDialog {
     JTextArea txtMonsterLongDesc = new JTextArea();
     // Not sorted
 
-//    public static void create(Frame frame, Monster monster) {
+//    public static void create(Frame frame, MonsterDialog monster) {
     public static void create(Frame frame) {
-        MonsterViewer monsterViewer = new MonsterViewer(frame, "Monster", true);
+        MonsterViewer monsterViewer = new MonsterViewer(frame, "MonsterDialog", true);
         monsterViewer.setLocationRelativeTo(frame);
+        monsterViewer.setVisible(true);
+
+        Dimension dlgSize = monsterViewer.getPreferredSize();
+        Dimension frmSize = frame.getSize();
+        Point loc = frame.getLocation();
+        monsterViewer.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x, (frmSize.height - dlgSize.height) / 2 + loc.y);
+        monsterViewer.setModal(true);
         monsterViewer.setVisible(true);
     }
 
@@ -66,11 +70,11 @@ public class MonsterViewer extends JDialog {
     }
 
     private void jbInit() throws Exception {
-        jLabel4.setText("Monster Name");
+        jLabel4.setText("MonsterDialog Name");
         jLabel5.setText("Description for code comment");
         pnlMonsterBasics.setLayout(borderLayout6);
         jScrollPane1.setBorder(BorderFactory.createLoweredBevelBorder());
-        jLabel1.setText("Monster Number ");
+        jLabel1.setText("MonsterDialog Number ");
         jLabel3.setText("Long Description");
         jLabel2.setText("Short Description");
         pnlMonsterBasicsLayout1.setLayout(borderLayout5);

@@ -22,6 +22,7 @@ public class LoadedObject implements Exportable {
     public static final String XML_LOADED_OBJECT_TRACK = "LOADOBJTRACK";
     public static final String XML_LOADED_OBJECT_UNIQUE = "LOADOBJUNIQUE";
     public static final String XML_LOADED_OBJECT_PRESENT = "LOADOBJPRESENT";
+    public static final String XML_LOADED_OBJECT_UUID = "LOADOBJUUID";
 
     public static final int OBJECT_TYPE_OBJ = 1;
     public static final int OBJECT_TYPE_MON = 2;
@@ -33,6 +34,9 @@ public class LoadedObject implements Exportable {
     private int _loadType;
     private String _fileName;
     private String _message;
+
+    // UUID for object/monster
+    private String uuid;
 
     //----------------------------------------------------------
     // Accessors/Mutators
@@ -51,6 +55,16 @@ public class LoadedObject implements Exportable {
 
     public String getMessage() {return _message;}
     public void setMessage(String data) {_message = data;}
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+
 
     //----------------------------------------------------------
     // Constructors
@@ -74,6 +88,7 @@ public class LoadedObject implements Exportable {
         int loadType = 0;
         String fileName = null;
         String message = null;
+        String uuid = null;
 
         if (root != null) {
             tmp = root.getChild(XML_LOADED_OBJECT_OBJECT);
@@ -91,8 +106,15 @@ public class LoadedObject implements Exportable {
             tmp = root.getChild(XML_LOADED_OBJECT_UNIQUE);
             if (tmp != null) loadType = LOAD_TYPE_UNIQUE;
 
+            tmp = root.getChild(XML_LOADED_OBJECT_UUID);
+            if (tmp != null) uuid = tmp.getTextTrim();
+
+
             if (objectType != 0 && loadType != 0 && fileName != null && message != null) {
                 object = new LoadedObject(objectType, loadType, fileName, message);
+                if(uuid!=null){
+                    object.setUuid(uuid);
+                }
             }
         }
 
@@ -121,6 +143,10 @@ public class LoadedObject implements Exportable {
             obj.addContent(new Element(XML_LOADED_OBJECT_TRACK));
         } else {
             obj.addContent(new Element(XML_LOADED_OBJECT_UNIQUE));
+        }
+        if(uuid != null) {
+            obj.addContent(EleUtils.createElement(XML_LOADED_OBJECT_UUID, uuid));
+
         }
 
         return obj;

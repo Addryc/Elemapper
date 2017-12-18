@@ -8,25 +8,20 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.borland.jbcl.layout.VerticalFlowLayout;
-import org.elephant.mapper.EleConstants;
-import org.elephant.mapper.EleHashtable;
-import org.elephant.mapper.Function;
-import org.elephant.mapper.LoadedObject;
-import org.elephant.mapper.Room;
+import org.elephant.mapper.*;
 import org.elephant.mapper.helper.RoomHelper;
 
 /**
@@ -112,6 +107,8 @@ public class RoomTabs extends JTabbedPane {
     private JComboBox selGuardCheckFunctions = new JComboBox();
     private JComboBox selGuardMessageFunctions = new JComboBox();
     private JComboBox selGuardWizardFunctions = new JComboBox();
+    private JCheckBox cbRoomDescLongQuotes = new JCheckBox();
+
     private JLabel lblRoomNumber = new JLabel();
     private JLabel jLabel1 = new JLabel();
     private JLabel jLabel2 = new JLabel();
@@ -192,6 +189,7 @@ public class RoomTabs extends JTabbedPane {
     private JPanel pnlRoomObjectsLayout8 = new JPanel();
     private JPanel pnlRoomObjectsLayout9 = new JPanel();
     private JPanel pnlRoomObjectsLayout10 = new JPanel();
+
     private JPanel pnlRoomGuards = new JPanel();
     private JPanel pnlRoomGuardsLayout1 = new JPanel();
     private JPanel pnlRoomGuardsLayout2 = new JPanel();
@@ -416,11 +414,36 @@ public class RoomTabs extends JTabbedPane {
                 lstObjects_valueChanged(e);
             }
         });
+
+        lstObjects.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+                //String uuid = monsterListTable.getValueAt(monsterListTable.getSelectedRow(), 0).toString();
+                if (e.getClickCount() == 2) {
+                    LoadedObject loadedObject = (LoadedObject) lstObjects.getSelectedValue();
+                    if(loadedObject.getObjectType() == LoadedObject.OBJECT_TYPE_MON) {
+                        if(loadedObject.getUuid() != null) {
+                            eleFrame.showMonsterDialog(loadedObject.getUuid());
+                        } else {
+                            // Legacy loadable - make best effort to create a new Uuid
+                            Monster monster = new Monster();
+                            loadedObject.setUuid(monster.getUuid());
+                            monster.setFileName(loadedObject.getFileName());
+                            eleFrame.showMonsterDialog(monster);
+                        }
+                    }
+                }
+
+            }
+        });
         lstFunctions.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 lstFunctions_valueChanged(e);
             }
         });
+
+
 
         // Other Listeners
         optIndoors.setText("Indoors");
@@ -635,6 +658,18 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomBasicsLayout4.setBorder(borderInset5);
         pnlRoomBasicsLayout4.setLayout(borderLayout3);
         pnlRoomBasicsLayout4.add(jLabel3, BorderLayout.NORTH);
+        cbRoomDescLongQuotes.setText("Quotes/Wrap");
+        cbRoomDescLongQuotes.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent changeEvent) {
+                if(eleFrame.getRoomHelper().hasSingleRoomSelected()) {
+                    eleFrame.getRoomHelper().getSelectedRoom().setLongDescQuotes(cbRoomDescLongQuotes.isSelected());
+                }
+            }
+        });
+
+        cbRoomDescLongQuotes.setSelected(true);
+        pnlRoomBasicsLayout4.add(cbRoomDescLongQuotes, BorderLayout.EAST);
         pnlRoomBasicsLayout4.add(jScrollPane1, BorderLayout.CENTER);
         jScrollPane1.getViewport().add(txtRoomLongDesc, null);
         pnlRoomBasicsLayout5.setLayout(borderLayout4);
@@ -778,6 +813,8 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomObjects.setLayout(borderLayout43);
         pnlRoomObjects.add(pnlRoomObjectsLayout1, BorderLayout.WEST);
         pnlRoomObjects.add(pnlRoomObjectsLayout2, BorderLayout.CENTER);
+
+
         // Guards
         jScrollPane10.getViewport().add(lstAvailableGuardObjects, null);
         pnlRoomGuardsLayout18.setLayout(borderLayout71);
@@ -1006,7 +1043,7 @@ public class RoomTabs extends JTabbedPane {
                 optObjectLoadTrack.isSelected(),
                 optObjectLoadUnique.isSelected(),
                 optObjectTypeMon.isSelected(),
-                txtObjectMessage.getText());
+                txtObjectMessage.getText(), null);
 
         updateObjectLists();
         txtObjectFileName.setText("");
@@ -1086,10 +1123,10 @@ public class RoomTabs extends JTabbedPane {
 
     void optSmells_itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.DESELECTED) {
-            saveSenses(eleFrame.getRoomHelper().getRoom().getSmells());
+            saveSenses(eleFrame.getRoomHelper().getSelectedRoom().getSmells());
         } else if (e.getStateChange() == ItemEvent.SELECTED) {
             if (senseSelected != optSmells) {
-                loadSenses(eleFrame.getRoomHelper().getRoom().getSmells());
+                loadSenses(eleFrame.getRoomHelper().getSelectedRoom().getSmells());
                 senseSelected = optSmells;
             }
         }
@@ -1097,10 +1134,10 @@ public class RoomTabs extends JTabbedPane {
 
     void optSounds_itemStateChanged(ItemEvent e) {
         if (e.getStateChange() == ItemEvent.DESELECTED) {
-            saveSenses(eleFrame.getRoomHelper().getRoom().getSounds());
+            saveSenses(eleFrame.getRoomHelper().getSelectedRoom().getSounds());
         } else if (e.getStateChange() == ItemEvent.SELECTED) {
             if (senseSelected != optSounds) {
-                loadSenses(eleFrame.getRoomHelper().getRoom().getSounds());
+                loadSenses(eleFrame.getRoomHelper().getSelectedRoom().getSounds());
                 senseSelected = optSounds;
             }
         }
@@ -1113,9 +1150,9 @@ public class RoomTabs extends JTabbedPane {
     void lstItems_valueChanged(ListSelectionEvent e) {
         int index = lstItems.getSelectedIndex();
         if (index >= 0) {
-            if (eleFrame.getRoomHelper().hasRoom()) {
-                txtItemDescription.setText(eleFrame.getRoomHelper().getRoom().getItem(index).getDescription());
-                txtItemNames.setText(eleFrame.getRoomHelper().getRoom().getItem(index).getNames());
+            if (eleFrame.getRoomHelper().hasSingleRoomSelected()) {
+                txtItemDescription.setText(eleFrame.getRoomHelper().getSelectedRoom().getItem(index).getDescription());
+                txtItemNames.setText(eleFrame.getRoomHelper().getSelectedRoom().getItem(index).getNames());
             }
         }
     }
@@ -1173,6 +1210,10 @@ public class RoomTabs extends JTabbedPane {
     // Package local functions
     //-------------------------------------------------
 
+    void saveCurrentRoomSettings(JPanel pnlProperties, boolean viewProperties) {
+        saveCurrentRoomSettings(eleFrame.getRoomHelper().getSelectedRoom(), pnlProperties, viewProperties);
+    }
+
     void saveCurrentRoomSettings(Room room, JPanel pnlProperties, boolean viewProperties) {
         int[] tmp;
 
@@ -1180,6 +1221,7 @@ public class RoomTabs extends JTabbedPane {
             room.setCodeDescription(txtRoomCodeDesc.getText().trim());
             room.setShortDescription(txtRoomShortDesc.getText().trim());
             room.setLongDescription(txtRoomLongDesc.getText().trim());
+            room.setLongDescQuotes(cbRoomDescLongQuotes.isSelected());
             room.setRoomName(txtRoomName.getText().trim());
             room.setLight(sldrLightLevel.getValue());
             saveSenses(findSense(room));
@@ -1212,6 +1254,7 @@ public class RoomTabs extends JTabbedPane {
             txtRoomCodeDesc.setText(room.getCodeDescription());
             txtRoomShortDesc.setText(room.getShortDescription());
             txtRoomLongDesc.setText(room.getLongDescription());
+            cbRoomDescLongQuotes.setSelected(room.isLongDescQuotes());
             txtRoomName.setText(room.getRoomName());
             updateItemList();
             sldrLightLevel.setValue(room.getLight());
@@ -1261,15 +1304,15 @@ public class RoomTabs extends JTabbedPane {
     }
 
     private void updateItemList() {
-        lstItems.setListData(eleFrame.getRoomHelper().getRoom().getItems().toArray());
+        lstItems.setListData(eleFrame.getRoomHelper().getSelectedRoom().getItems().toArray());
     }
 
     private void updateDirectionList() {
-        lstGuardDirections.setListData(eleFrame.getRoomHelper().getRoom().getExitDirections());
+        lstGuardDirections.setListData(eleFrame.getRoomHelper().getSelectedRoom().getExitDirections());
     }
 
-    private void updateObjectLists() {
-        ArrayList loadedObjects = eleFrame.getRoomHelper().getRoom().getLoadedObjects();
+    public void updateObjectLists() {
+        ArrayList loadedObjects = eleFrame.getRoomHelper().getSelectedRoom().getLoadedObjects();
 
         lstObjects.setListData(loadedObjects.toArray());
         // todo JPC This needs to seperate out the guards from non-guards
@@ -1277,7 +1320,7 @@ public class RoomTabs extends JTabbedPane {
     }
 
     private void updateFunctionLists() {
-        ArrayList functions = eleFrame.getRoomHelper().getRoom().getFunctions();
+        ArrayList functions = eleFrame.getRoomHelper().getSelectedRoom().getFunctions();
         Iterator iter;
         Object key;
 
