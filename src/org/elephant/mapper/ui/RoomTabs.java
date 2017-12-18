@@ -21,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import com.borland.jbcl.layout.VerticalFlowLayout;
+import com.inet.jortho.SpellChecker;
 import org.elephant.mapper.*;
 import org.elephant.mapper.helper.RoomHelper;
 
@@ -532,6 +533,9 @@ public class RoomTabs extends JTabbedPane {
         txtRoomLongDesc.setWrapStyleWord(true);
         txtRoomLongDesc.setLineWrap(true);
         txtRoomLongDesc.setFont(textFont);
+
+        SpellChecker.register(txtRoomLongDesc);
+
         txtRoomLongDescCopy.setFont(new Font("SansSerif", 0, 12));
         txtRoomLongDescCopy.setDisabledTextColor(Color.black);
         txtRoomLongDescCopy.setLineWrap(true);
@@ -652,6 +656,7 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomBasicsLayout2.setLayout(borderLayout1);
         pnlRoomBasicsLayout2.add(jLabel26, BorderLayout.NORTH);
         pnlRoomBasicsLayout2.add(txtRoomCodeDesc, BorderLayout.SOUTH);
+
         pnlRoomBasicsLayout3.setLayout(borderLayout2);
         pnlRoomBasicsLayout3.add(jLabel4, BorderLayout.NORTH);
         pnlRoomBasicsLayout3.add(txtRoomName, BorderLayout.SOUTH);

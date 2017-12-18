@@ -131,7 +131,7 @@ public class Monster extends LpcObject implements Exportable {
             }
 
 
-            tmp = root.getChild(XML_LEVEL);
+            tmp = root.getChild(XML_EMOTE_FREQ);
             if (tmp != null) {
                 monster.setEmoteFrequency(Integer.valueOf(tmp.getTextTrim()));
             }

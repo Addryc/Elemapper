@@ -1,9 +1,11 @@
 package org.elephant.mapper;
 
+import com.inet.jortho.SpellChecker;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Properties;
 
 import java.awt.Color;
@@ -107,6 +109,7 @@ public final class EleConstants {
             BACKGROUND_COLOUR = Color.decode(props.getProperty("BACKGROUND_COLOUR", String.valueOf(BACKGROUND_COLOUR.getRGB())));
             LOWER_LEVEL_COLOUR = Color.decode(props.getProperty("LOWER_LEVEL_COLOUR", String.valueOf(LOWER_LEVEL_COLOUR.getRGB())));
             UPPER_LEVEL_COLOUR = Color.decode(props.getProperty("UPPER_LEVEL_COLOUR", String.valueOf(UPPER_LEVEL_COLOUR.getRGB())));
+
 
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();

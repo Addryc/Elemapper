@@ -1,5 +1,8 @@
 package org.elephant.mapper.ui;
 
+import com.inet.jortho.FileUserDictionary;
+import com.inet.jortho.SpellChecker;
+import org.elephant.mapper.EleConstants;
 import org.elephant.mapper.Exportable;
 import org.elephant.mapper.Monster;
 import org.elephant.mapper.Room;
@@ -43,7 +46,6 @@ public class MonsterDialog extends JDialog {
     private JTable monEmotes;
     private JTextField monEmoteFreq;
     private Monster monster;
-
     private Monster getMonster() {
         return monster;
     }
@@ -117,6 +119,7 @@ public class MonsterDialog extends JDialog {
     }
     private void init(EleFrame eleFrame, Monster monster) {
         this.eleFrame = eleFrame;
+
         if(monster != null) {
             initMonValues(monster);
         }
@@ -248,17 +251,23 @@ public class MonsterDialog extends JDialog {
         monShort.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
+                super.focusLost(e);
                 getMonster().setShortDesc(monShort.getText());
                 updatePreview();
             }
         });
+
         monLong.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
+                super.focusLost(e);
                 getMonster().setLongDesc(monLong.getText());
                 updatePreview();
             }
         });
+
+        SpellChecker.register(monLong);
+
         genderSelection.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

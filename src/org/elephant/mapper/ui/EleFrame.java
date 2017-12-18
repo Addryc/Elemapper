@@ -19,6 +19,8 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.*;
 
+import com.inet.jortho.FileUserDictionary;
+import com.inet.jortho.SpellChecker;
 import org.elephant.mapper.*;
 import org.elephant.mapper.helper.ExitHelper;
 import org.elephant.mapper.helper.RoomHelper;
@@ -171,6 +173,10 @@ public class EleFrame extends JFrame {
 
     public EleFrame() {
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+
+        SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
+        SpellChecker.registerDictionaries(EleConstants.class.getResource("/dictionary"), "en");
+
         try {
             jbInit();
         } catch(Exception e) {
