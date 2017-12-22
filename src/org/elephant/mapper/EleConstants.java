@@ -79,6 +79,81 @@ public final class EleConstants {
     public static final String DEFINE_ROOM_PATH     = "ROOMDIR";
     private static boolean initialized = false;
 
+    public static final int MAX_LINE_LENGTH = 78;
+    public static final String INDENT = "    ";
+    public static String getIndent(int indents) {
+        String ret = "";
+        for(int i=0;i<indents;i++) {
+            ret+=INDENT;
+        }
+        return ret;
+
+    }
+
+    enum MACRO_TYPE {
+        ARRAY,
+        MAPPING,
+        FIXED
+    }
+
+    enum MACRO {
+        CLASS(MACRO_TYPE.MAPPING, 1),
+        RACE(MACRO_TYPE.MAPPING, 1),
+        DAY(MACRO_TYPE.FIXED, 4),
+        RANDOM(MACRO_TYPE.ARRAY, 1),
+        SEASON(MACRO_TYPE.FIXED, 4),
+        ALIGN(MACRO_TYPE.FIXED, 3),
+        QUEST(MACRO_TYPE.FIXED, 3);
+
+        private MACRO_TYPE type;
+        private int expected_args;
+        private MACRO(MACRO_TYPE type, int expected_args) {
+            this.type = type;
+            this.expected_args = expected_args;
+        }
+        public MACRO_TYPE getType() { return this.type; }
+        public String getMacroName() { return this.name()+"CHANGE"; }
+
+        public static MACRO find(String macro) {
+            for (MACRO value: MACRO.values()) {
+                if (value.name().equals(macro)) {
+                    return value;
+                }
+            }
+
+            return null;
+        }
+
+        public String[] replaceMacroValues(String match) {
+            if(this.type == MACRO_TYPE.MAPPING) {
+                match = match.replaceAll(":","\":\"");
+            }
+
+            return match.split("\\|");
+        }
+
+        public boolean validMacro(String match) {
+            String[] split = match.split("\\|");
+            // Check 1: Expected Args
+            if(split.length==0 || (this.type == MACRO_TYPE.FIXED && split.length!=expected_args) ||
+                    this.type!=MACRO_TYPE.FIXED && split.length<expected_args) {
+                return false;
+            }
+
+            // Check 2 - Mappings - make sure we have valid key/value pairs
+            if(type==MACRO_TYPE.MAPPING) {
+                for(String arg: split) {
+                    if(!arg.contains(":")) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+
+        }
+    }
+
     private static File PROPS = new File("EleMapper.properties");
 
     public static Configuration freeMarkerConfig;

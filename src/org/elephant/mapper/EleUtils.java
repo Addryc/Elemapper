@@ -72,10 +72,9 @@ public class EleUtils {
 
         if (line.length() > 0) list.add(line);
 
-        // trim the last sentence
         size = list.size();
         if (size > 0) {
-            list.set(size-1, list.get(size-1).trim());
+            list.set(size-1, list.get(size-1));
         }
 
         // convert to array

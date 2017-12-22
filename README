@@ -4,6 +4,9 @@ Elemapper Updates
 Version 2.0 - Dec 2017 - Jazz@Elephant
 ===================================================================
 
+Add support for embedded macros/COMBINE in Room Descs:
+    - Syntax is: DAYCHANGE(A|B|C|D), RACECHANGE(elf:foo|human:bar), etc
+    - COMBINE macro is auto-generated if a macro is detected within the body
 Add support for Monster Manager - Create and add Monsters
 Add support for multi-click operations on rooms
 Add support for freemarker-based templates for LPC-generated files

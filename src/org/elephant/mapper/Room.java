@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jdom.CDATA;
 import org.jdom.Element;
@@ -628,6 +630,128 @@ public class Room extends Rectangle implements EleMappable {
         return room;
     }
 
+    static final String MACROCHANGE_REGEX = "([A-Z]+)CHANGE\\((.+?)\\)";
+    static final Pattern ALL_CHANGE_PATTERN = Pattern.compile(MACROCHANGE_REGEX);
+
+    public static String replaceMacros(String id, String longDesc) throws EleMapExportException {
+
+        Matcher matcher;
+        String indent = EleConstants.getIndent(3);
+        matcher = ALL_CHANGE_PATTERN.matcher(longDesc);
+        List<String> tokens = new ArrayList<>();
+        int subSequenceEnd = 0;
+        longDesc = EleUtils.replace(longDesc, "\n", "\\n");
+        while (matcher.find()) {
+            // Add any substrings between matches
+            String untokenized  = longDesc.substring(subSequenceEnd, matcher.start());
+            tokens.add(wrapText(untokenized));
+            String matchBase = matcher.group(0);
+            String macroType = matcher.group(1);
+            String matchReplace = "";
+
+            EleConstants.MACRO macro = EleConstants.MACRO.find(macroType);
+            if (macro!=null) {
+                if(!macro.validMacro(matcher.group(2))) {
+                    throw new EleMapExportException(id+ " description has an invalid macro ("+
+                            matchBase+").", null);
+
+                }
+                matchReplace = wrapText(macro.getMacroName(),
+                        macro.replaceMacroValues(matcher.group(2)),
+                        macro.getType());
+            }
+
+            tokens.add(matchReplace);
+            subSequenceEnd = matcher.end();
+
+        }
+
+        if(tokens.size()>0) {
+            if(subSequenceEnd<longDesc.length()) {
+                tokens.add(wrapText(longDesc.substring(subSequenceEnd, longDesc.length())));
+            }
+
+            longDesc = "COMBINE(({" +
+                    "\n"+indent+
+                    String.join(",\n"+indent, tokens)+"}))";
+        } else {
+            longDesc = "\""+longDesc+"\"";
+        }
+        return longDesc;
+    }
+
+    private static String wrapText(String macro, String[] fragments, EleConstants.MACRO_TYPE macroType) {
+        String spacer = "\n"+EleConstants.getIndent(3);
+
+        String ret = "";
+        String line = "";
+        ret+=macro+"(";
+        switch(macroType) {
+            case ARRAY:
+                ret+="({";
+                break;
+            case MAPPING:
+                ret+="([";
+                break;
+        }
+        spacer+="    ";
+        int i= 0;
+        for (String fragment: fragments) {
+            line = spacer+"\""+fragment+"\"";
+            if (line.length() < EleConstants.MAX_LINE_LENGTH) {
+                ret+=line;
+            } else {
+                ret+=spacer+wrapText(fragment, 4);
+            }
+
+            if(++i < fragments.length) {
+                ret+=",";
+            }
+        }
+        switch(macroType) {
+            case ARRAY:
+                ret+="})";
+                break;
+            case MAPPING:
+                ret+="])";
+                break;
+        }
+        ret+=")";
+        return ret ;
+
+
+    }
+    private static String wrapText(String fragment) {
+        return wrapText(fragment, 3);
+    }
+    private static String wrapText(String fragment, int indents) {
+        String ret = "";
+        String spacer;
+
+        String[] tmpArray = EleUtils.breakString(fragment, 60);
+
+        spacer = "";
+        String indent = EleConstants.getIndent(indents);
+        for(int i=0;i<tmpArray.length;i++) {
+            if (i>0) {
+                spacer = "\n"+indent;
+            }
+            ret+=(spacer + "\"" + tmpArray[i] + "\"");
+
+        }
+
+        return ret;
+
+    }
+
+    private String getLongDescTokenized(boolean tokenReplace) throws EleMapExportException {
+        if (tokenReplace) {
+            return Room.replaceMacros("Room "+_roomNumber, _longDesc);
+        } else {
+            return _longDesc;
+        }
+    }
+
     public void export(File directory, String path, BufferedWriter bw, String seperator) throws EleMapExportException, IOException {
         File room = new File(directory.getAbsolutePath() + File.separator + _roomName + ".c");
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm, dd MMM yyyy");
@@ -710,32 +834,7 @@ public class Room extends Rectangle implements EleMappable {
         bw.write("    set_short(\""+_shortDesc+"\");\n");
 
         bw.write("    set_long(");
-
-        if (_longDescQuotes) {
-            tmpArray = EleUtils.breakString(EleUtils.replace(_longDesc, "\n", "\\n"), 60);
-
-            spacer = "";
-            if (tmpArray.length > 0) {
-                int i = 0;
-                String stringSection = tmpArray[0];
-                bw.write(spacer + (_longDescQuotes?"\"":"") + stringSection + "\"");
-                i++;
-                boolean lastRow = false;
-                if(tmpArray.length>1) {
-                    for (;i<tmpArray.length;i++) {
-                        spacer = "\n             ";
-                        lastRow = (i == tmpArray.length-1);
-                        stringSection = tmpArray[i];
-                        bw.write(spacer + "\"" + stringSection + (!lastRow?"\"":""));
-                    }
-                }
-                bw.write(_longDescQuotes?"\"":"");
-            } else {
-                bw.write("\"\"");
-            }
-        } else {
-            bw.write(_longDesc);
-        }
+        bw.write(getLongDescTokenized(_longDescQuotes));
         bw.write(");\n");
 
         // Items
