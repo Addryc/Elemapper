@@ -1,13 +1,6 @@
 package org.elephant.mapper.ui;
 
-import java.awt.AWTEvent;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -108,6 +101,7 @@ public class RoomTabs extends JTabbedPane {
     private JComboBox selGuardCheckFunctions = new JComboBox();
     private JComboBox selGuardMessageFunctions = new JComboBox();
     private JComboBox selGuardWizardFunctions = new JComboBox();
+    private JButton btnRoomDescEditor = new JButton();
     private JCheckBox cbRoomDescLongQuotes = new JCheckBox();
 
     private JLabel lblRoomNumber = new JLabel();
@@ -329,7 +323,7 @@ public class RoomTabs extends JTabbedPane {
         Font textFont = new Font("SansSerif", 0, 12);
         Font codeFont = new Font("Monospaced", 0, 11);
         Border borderInset5 = BorderFactory.createEmptyBorder(5,5,5,5);
-
+        Border borderRoom = BorderFactory.createEtchedBorder();
         // Buttons
         btnItemAdd.setText("Add/Update");
         btnItemAdd.addActionListener(new ActionListener() {
@@ -544,8 +538,8 @@ public class RoomTabs extends JTabbedPane {
         txtRoomLongDescCopy.setWrapStyleWord(true);
         txtRoomLongDescCopy.setDocument(txtRoomLongDesc.getDocument());
         txtRoomLongDescCopy.setBackground(EleConstants.DISABLED_COLOUR);
-        txtRoomName.setMinimumSize(new Dimension(120, 21));
-        txtRoomName.setPreferredSize(new Dimension(120, 21));
+        txtRoomName.setMinimumSize(new Dimension(120, 42));
+        txtRoomName.setPreferredSize(new Dimension(120, 42));
         txtItemDescription.setWrapStyleWord(true);
         txtItemDescription.setLineWrap(true);
         txtItemDescription.setBorder(null);
@@ -665,9 +659,23 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomBasicsLayout3.setLayout(borderLayout2);
         pnlRoomBasicsLayout3.add(jLabel4, BorderLayout.NORTH);
         pnlRoomBasicsLayout3.add(txtRoomName, BorderLayout.SOUTH);
-        pnlRoomBasicsLayout4.setBorder(borderInset5);
+        pnlRoomBasicsLayout4.setBorder(borderRoom);
         pnlRoomBasicsLayout4.setLayout(borderLayout3);
         pnlRoomBasicsLayout4.add(jLabel3, BorderLayout.NORTH);
+
+        JPanel pnlRoomLongActions = new JPanel();
+        GridLayout actionLayout = new GridLayout(0,1);
+        pnlRoomLongActions.setLayout(actionLayout);
+        btnRoomDescEditor.setText("Editor");
+        btnRoomDescEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                DescriptionEditor dialog = new DescriptionEditor(eleFrame, txtRoomLongDesc,
+                        "Long", eleFrame.getRoomHelper().getSelectedRoom().getRoomName(), txtRoomLongDesc.getText());
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
         cbRoomDescLongQuotes.setText("Quotes/Wrap");
         cbRoomDescLongQuotes.addChangeListener(new ChangeListener() {
             @Override
@@ -679,7 +687,11 @@ public class RoomTabs extends JTabbedPane {
         });
 
         cbRoomDescLongQuotes.setSelected(true);
-        pnlRoomBasicsLayout4.add(cbRoomDescLongQuotes, BorderLayout.EAST);
+
+        pnlRoomLongActions.add(btnRoomDescEditor);
+        pnlRoomLongActions.add(cbRoomDescLongQuotes);
+        pnlRoomBasicsLayout4.add(pnlRoomLongActions, BorderLayout.EAST);
+
         pnlRoomBasicsLayout4.add(jScrollPane1, BorderLayout.CENTER);
         jScrollPane1.getViewport().add(txtRoomLongDesc, null);
         pnlRoomBasicsLayout5.setLayout(borderLayout4);

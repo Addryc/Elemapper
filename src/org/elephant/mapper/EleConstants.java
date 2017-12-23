@@ -97,23 +97,25 @@ public final class EleConstants {
     }
 
     enum MACRO {
-        CLASS(MACRO_TYPE.MAPPING, 1),
-        RACE(MACRO_TYPE.MAPPING, 1),
-        DAY(MACRO_TYPE.FIXED, 4),
-        RANDOM(MACRO_TYPE.ARRAY, 1),
-        SEASON(MACRO_TYPE.FIXED, 4),
-        ALIGN(MACRO_TYPE.FIXED, 3),
-        QUEST(MACRO_TYPE.FIXED, 3);
+        CLASS(MACRO_TYPE.MAPPING, 1,"myClass:this|otherClass:that|default:everyone"),
+        RACE(MACRO_TYPE.MAPPING, 1,"myRace:this|otherRace:that|default:everyone"),
+        DAY(MACRO_TYPE.FIXED, 4,"NIGHT|DAWN|DAY|DUSK"),
+        RANDOM(MACRO_TYPE.ARRAY, 1,"A|B|C"),
+        SEASON(MACRO_TYPE.FIXED, 4,"WIN|SPR|SUM|AUT"),
+        ALIGN(MACRO_TYPE.FIXED, 3,"GOOD|NEUTRAL|EVIL"),
+        QUEST(MACRO_TYPE.FIXED, 3,"QUEST|DONE|NOTDONE");
 
         private MACRO_TYPE type;
         private int expected_args;
-        private MACRO(MACRO_TYPE type, int expected_args) {
+        private String template = "";
+        private MACRO(MACRO_TYPE type, int expected_args, String template) {
             this.type = type;
             this.expected_args = expected_args;
+            this.template = template;
         }
         public MACRO_TYPE getType() { return this.type; }
         public String getMacroName() { return this.name()+"CHANGE"; }
-
+        public String getTemplate() { return getMacroName()+"("+this.template+")";}
         public static MACRO find(String macro) {
             for (MACRO value: MACRO.values()) {
                 if (value.name().equals(macro)) {

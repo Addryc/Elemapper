@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.elephant.mapper.DescriptionEditor">
+  <grid id="cbd77" binding="contentPane" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="48" y="54" width="668" height="513"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="94766" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="0.0"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <grid id="9538f" layout-manager="GridBagLayout">
+            <constraints>
+              <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="1.0"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="e7465" class="javax.swing.JButton" binding="buttonOK">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <text value="OK"/>
+                </properties>
+              </component>
+              <component id="5723f" class="javax.swing.JButton" binding="buttonCancel">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties>
+                  <text value="Cancel"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <toolbar id="c8f2d">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="-1" height="20"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="9a255" class="javax.swing.JButton" binding="buttonDayChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="DAY"/>
+                </properties>
+              </component>
+              <component id="41374" class="javax.swing.JButton" binding="buttonClassChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="CLASS"/>
+                </properties>
+              </component>
+              <component id="c40d" class="javax.swing.JButton" binding="buttonRaceChange">
+                <constraints/>
+                <properties>
+                  <enabled value="true"/>
+                  <font size="8"/>
+                  <text value="RACE"/>
+                </properties>
+              </component>
+              <component id="e673f" class="javax.swing.JButton" binding="buttonAlignChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="ALIGN"/>
+                </properties>
+              </component>
+              <component id="a1197" class="javax.swing.JButton" binding="buttonRandomChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="RANDOM"/>
+                </properties>
+              </component>
+              <component id="e885a" class="javax.swing.JButton" binding="buttonQuestChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="QUEST"/>
+                </properties>
+              </component>
+              <component id="5b291" class="javax.swing.JButton" binding="buttonSeasonChange">
+                <constraints/>
+                <properties>
+                  <font size="8"/>
+                  <text value="SEASON"/>
+                </properties>
+              </component>
+            </children>
+          </toolbar>
+          <component id="28db8" class="javax.swing.JLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="1.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <text value="Macros"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="e3588" layout-manager="GridBagLayout">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties/>
+        <border type="bevel-lowered"/>
+        <children>
+          <scrollpane id="28d5d">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <minimum-size width="300" height="400"/>
+                <preferred-size width="300" height="400"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <preferredSize width="400" height="300"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="5de7e" class="javax.swing.JTextArea" binding="descriptionEditor">
+                <constraints/>
+                <properties>
+                  <lineWrap value="true"/>
+                  <wrapStyleWord value="true"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+          <scrollpane id="f2ee6">
+            <constraints>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <minimum-size width="300" height="400"/>
+                <preferred-size width="300" height="400"/>
+              </grid>
+              <gridbag weightx="1.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <preferredSize width="500" height="300"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="4a80b" class="javax.swing.JTextArea" binding="previewArea">
+                <constraints/>
+                <properties>
+                  <columns value="80"/>
+                  <editable value="false"/>
+                  <font/>
+                  <lineWrap value="true"/>
+                  <preferredSize width="800" height="18"/>
+                  <wrapStyleWord value="true"/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+          <component id="7624e" class="javax.swing.JButton" binding="buttonUpdatePreview">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="1.0"/>
+            </constraints>
+            <properties>
+              <text value="-&gt;"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

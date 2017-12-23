@@ -4,6 +4,7 @@ Elemapper Updates
 Version 2.0 - Dec 2017 - Jazz@Elephant
 ===================================================================
 
+Add 'Editor' dialog for Room Descriptions with previews and macro inserts
 Add support for embedded macros/COMBINE in Room Descs:
     - Syntax is: DAYCHANGE(A|B|C|D), RACECHANGE(elf:foo|human:bar), etc
     - COMBINE macro is auto-generated if a macro is detected within the body

@@ -644,7 +644,7 @@ public class Room extends Rectangle implements EleMappable {
         while (matcher.find()) {
             // Add any substrings between matches
             String untokenized  = longDesc.substring(subSequenceEnd, matcher.start());
-            tokens.add(wrapText(untokenized));
+            tokens.add(wrapText(untokenized, tokens.size()>0));
             String matchBase = matcher.group(0);
             String macroType = matcher.group(1);
             String matchReplace = "";
@@ -666,9 +666,10 @@ public class Room extends Rectangle implements EleMappable {
 
         }
 
+        tokens.remove("");
         if(tokens.size()>0) {
             if(subSequenceEnd<longDesc.length()) {
-                tokens.add(wrapText(longDesc.substring(subSequenceEnd, longDesc.length())));
+                tokens.add(wrapText(longDesc.substring(subSequenceEnd, longDesc.length()), true));
             }
 
             longDesc = "COMBINE(({" +
@@ -722,21 +723,43 @@ public class Room extends Rectangle implements EleMappable {
 
     }
     private static String wrapText(String fragment) {
-        return wrapText(fragment, 3);
+        return wrapText(fragment, 3, false);
     }
+
     private static String wrapText(String fragment, int indents) {
+        return wrapText(fragment, indents, false);
+    }
+
+    private static String wrapText(String fragment, boolean spacePadding) {
+        return wrapText(fragment, 3, spacePadding);
+    }
+
+    private static String wrapText(String fragment, int indents, boolean spacePadding) {
         String ret = "";
         String spacer;
+
+        // Empty string should be returned as a space
+        if(fragment.trim().length() == 0) {
+            return "\" \"";
+        }
 
         String[] tmpArray = EleUtils.breakString(fragment, 60);
 
         spacer = "";
+        if (spacePadding) {
+            ret+=" ";
+        }
+
+
         String indent = EleConstants.getIndent(indents);
         for(int i=0;i<tmpArray.length;i++) {
             if (i>0) {
                 spacer = "\n"+indent;
             }
-            ret+=(spacer + "\"" + tmpArray[i] + "\"");
+
+            ret+=(spacer + "\""
+                    +(spacePadding && i==0?" ":"")
+                    + tmpArray[i] + "\"");
 
         }
 
