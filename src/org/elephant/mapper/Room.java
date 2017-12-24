@@ -631,20 +631,25 @@ public class Room extends Rectangle implements EleMappable {
     }
 
     static final String MACROCHANGE_REGEX = "([A-Z]+)CHANGE\\((.+?)\\)";
-    static final Pattern ALL_CHANGE_PATTERN = Pattern.compile(MACROCHANGE_REGEX);
+    static final String FN_REGEX = "\\(: (?<fn>.+?) :\\)";
+    static final Pattern ALL_CHANGE_PATTERN = Pattern.compile(MACROCHANGE_REGEX+"|"+FN_REGEX);
 
-    public static String replaceMacros(String id, String longDesc) throws EleMapExportException {
+    public static String replaceMacros(String id, String desc) throws EleMapExportException {
+        return replaceMacros(id, desc, 3);
+    }
+
+    public static String replaceMacros(String id, String desc, int numIndent) throws EleMapExportException {
 
         Matcher matcher;
-        String indent = EleConstants.getIndent(3);
-        matcher = ALL_CHANGE_PATTERN.matcher(longDesc);
+        String indent = EleConstants.getIndent(numIndent);
+        matcher = ALL_CHANGE_PATTERN.matcher(desc);
         List<String> tokens = new ArrayList<>();
         int subSequenceEnd = 0;
-        longDesc = EleUtils.replace(longDesc, "\n", "\\n");
+        desc = EleUtils.replace(desc, "\n", "\\n");
         while (matcher.find()) {
             // Add any substrings between matches
-            String untokenized  = longDesc.substring(subSequenceEnd, matcher.start());
-            tokens.add(wrapText(untokenized, tokens.size()>0));
+            String untokenized  = desc.substring(subSequenceEnd, matcher.start());
+            tokens.add(wrapText(untokenized, numIndent, tokens.size()>0));
             String matchBase = matcher.group(0);
             String macroType = matcher.group(1);
             String matchReplace = "";
@@ -658,7 +663,9 @@ public class Room extends Rectangle implements EleMappable {
                 }
                 matchReplace = wrapText(macro.getMacroName(),
                         macro.replaceMacroValues(matcher.group(2)),
-                        macro.getType());
+                        macro.getType(), numIndent);
+            } else if (matcher.group("fn") != null) {
+                matchReplace = matcher.group(0);
             }
 
             tokens.add(matchReplace);
@@ -668,21 +675,21 @@ public class Room extends Rectangle implements EleMappable {
 
         tokens.remove("");
         if(tokens.size()>0) {
-            if(subSequenceEnd<longDesc.length()) {
-                tokens.add(wrapText(longDesc.substring(subSequenceEnd, longDesc.length()), true));
+            if(subSequenceEnd<desc.length()) {
+                tokens.add(wrapText(desc.substring(subSequenceEnd, desc.length()), numIndent,true));
             }
 
-            longDesc = "COMBINE(({" +
+            desc = "COMBINE(({" +
                     "\n"+indent+
                     String.join(",\n"+indent, tokens)+"}))";
         } else {
-            longDesc = "\""+longDesc+"\"";
+            desc = "\""+desc+"\"";
         }
-        return longDesc;
+        return desc;
     }
 
-    private static String wrapText(String macro, String[] fragments, EleConstants.MACRO_TYPE macroType) {
-        String spacer = "\n"+EleConstants.getIndent(3);
+    private static String wrapText(String macro, String[] fragments, EleConstants.MACRO_TYPE macroType, int numIndents) {
+        String spacer = "\n"+EleConstants.getIndent(numIndents);
 
         String ret = "";
         String line = "";
@@ -702,7 +709,7 @@ public class Room extends Rectangle implements EleMappable {
             if (line.length() < EleConstants.MAX_LINE_LENGTH) {
                 ret+=line;
             } else {
-                ret+=spacer+wrapText(fragment, 4);
+                ret+=spacer+wrapText(fragment, numIndents+1);
             }
 
             if(++i < fragments.length) {
@@ -739,17 +746,13 @@ public class Room extends Rectangle implements EleMappable {
         String spacer;
 
         // Empty string should be returned as a space
-        if(fragment.trim().length() == 0) {
+        if(fragment.trim().length() == 0 && spacePadding) {
             return "\" \"";
         }
 
         String[] tmpArray = EleUtils.breakString(fragment, 60);
 
         spacer = "";
-        if (spacePadding) {
-            ret+=" ";
-        }
-
 
         String indent = EleConstants.getIndent(indents);
         for(int i=0;i<tmpArray.length;i++) {
@@ -758,11 +761,10 @@ public class Room extends Rectangle implements EleMappable {
             }
 
             ret+=(spacer + "\""
-                    +(spacePadding && i==0?" ":"")
+                    +(spacePadding && i==0 && tmpArray[i].charAt(0)!='.' && tmpArray[i].charAt(0)!=' '?" ":"")
                     + tmpArray[i] + "\"");
 
         }
-
         return ret;
 
     }

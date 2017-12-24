@@ -130,27 +130,7 @@ public class Item implements Exportable {
             item += " : ";
             bw.write(item);
 
-            tmp = EleUtils.replace(_desc, "\n", "\\n");
-            firstPart = EleUtils.firstPart(_desc, 64 - item.length() - 2); // 64 is the length of space we have to work with, -2 for the speech marks.
-
-            if (firstPart.length() > 0) {
-                if (firstPart.length() > tmp.length()) {
-                    tmp = "";
-                    firstPart = firstPart.trim();
-                } else {
-                    tmp = tmp.substring(firstPart.length());
-                }
-                bw.write("\""+firstPart+"\"");
-            }
-
-            if (tmp.length() > 0) {
-                array = EleUtils.breakString(tmp, 58); // now we are tabbed in (64-4) and -2 for speech marks.
-                spacer = "\n" + EleUtils.repeatChar(' ', 20);
-                for (final String stringSection : array) {
-                    bw.write(spacer);
-                    bw.write("\"" + stringSection + "\"");
-                }
-            }
+            bw.write(Room.replaceMacros("ITEM "+_names.get(0), _desc, 5));
         }
     }
 

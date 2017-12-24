@@ -29,8 +29,12 @@ public class RoomTabs extends JTabbedPane {
 
     private JButton btnItemAdd = new JButton();
     private JButton btnItemDelete = new JButton();
+    private JButton btnItemEditor = new JButton("Editor");
     private JButton btnSenseAdd = new JButton();
     private JButton btnSenseDelete = new JButton();
+    private JButton btnSenseEditor = new JButton("Editor");
+    private JButton btnSenseDefaultEditor = new JButton("Editor");
+    private JButton btnSenseDefaultVisibleEditor = new JButton("Editor");
     private JButton btnObjectDelete = new JButton();
     private JButton btnObjectAdd = new JButton();
     private JButton btnRoomColour = new JButton();
@@ -305,6 +309,7 @@ public class RoomTabs extends JTabbedPane {
     private JScrollPane jScrollPane12 = new JScrollPane();
     private JScrollPane jScrollPane13 = new JScrollPane();
     private JScrollPane jScrollPane14 = new JScrollPane();
+    private GridLayout actionLayout = new GridLayout(0,1);
 
 
     public RoomTabs(EleFrame eleFrame, JPanel pnlMap) {
@@ -337,16 +342,39 @@ public class RoomTabs extends JTabbedPane {
                 btnItemDelete_actionPerformed(e);
             }
         });
+
+        btnItemEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                DescriptionEditor dialog = new DescriptionEditor(eleFrame, txtItemDescription,
+                        "Item Desc", txtItemNames.getText(), txtItemDescription.getText());
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        });
         btnSenseAdd.setText("Add/Update");
+        btnSenseAdd.setPreferredSize(new Dimension(120,100));
         btnSenseAdd.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 btnSenseAdd_actionPerformed(e);
             }
         });
         btnSenseDelete.setText("Clear/Delete");
+        btnSenseDelete.setPreferredSize(new Dimension(120,100));
         btnSenseDelete.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 btnSenseDelete_actionPerformed(e);
+            }
+        });
+
+        btnSenseEditor.setPreferredSize(new Dimension(120,100));
+        btnSenseEditor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                DescriptionEditor dialog = new DescriptionEditor(eleFrame, txtSenseDescription,
+                        "Sense Desc", txtSenseName.getText(), txtSenseDescription.getText());
+                dialog.pack();
+                dialog.setVisible(true);
             }
         });
         btnObjectAdd.setText("Add/Update");
@@ -581,6 +609,7 @@ public class RoomTabs extends JTabbedPane {
         jScrollPane4.setMinimumSize(new Dimension(150, 0));
         jScrollPane4.setPreferredSize(new Dimension(150, 0));
         jScrollPane5.setBorder(BorderFactory.createLoweredBevelBorder());
+        jScrollPane5.setPreferredSize(new Dimension(150, 200));
         jScrollPane6.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane6.setBorder(BorderFactory.createLoweredBevelBorder());
         jScrollPane6.setMinimumSize(new Dimension(150, 0));
@@ -664,7 +693,6 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomBasicsLayout4.add(jLabel3, BorderLayout.NORTH);
 
         JPanel pnlRoomLongActions = new JPanel();
-        GridLayout actionLayout = new GridLayout(0,1);
         pnlRoomLongActions.setLayout(actionLayout);
         btnRoomDescEditor.setText("Editor");
         btnRoomDescEditor.addActionListener(new ActionListener() {
@@ -715,6 +743,7 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomItemsLayout1.add(jScrollPane2, BorderLayout.WEST);
         pnlRoomItemsLayout4.add(btnItemAdd, null);
         pnlRoomItemsLayout4.add(btnItemDelete, null);
+        pnlRoomItemsLayout4.add(btnItemEditor, null);
         pnlRoomItemsLayout5.setLayout(borderLayout17);
         pnlRoomItemsLayout5.add(jLabel11, BorderLayout.NORTH);
         pnlRoomItemsLayout5.add(txtItemNames, BorderLayout.CENTER);
@@ -759,7 +788,8 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomMisc.add(pnlRoomMiscLayout1, BorderLayout.WEST);
         pnlRoomMisc.add(pnlRoomMiscLayout2, BorderLayout.EAST);
         // Senses
-        pnlRoomSensesLayout10.setLayout(verticalFlowLayout4);
+        pnlRoomSensesLayout10.setLayout(actionLayout);
+        pnlRoomSensesLayout10.add(btnSenseEditor, null);
         pnlRoomSensesLayout10.add(btnSenseAdd, null);
         pnlRoomSensesLayout10.add(btnSenseDelete, null);
         pnlRoomSensesLayout11.setLayout(borderLayout36);
@@ -773,17 +803,21 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomSensesLayout8.setLayout(borderLayout27);
         pnlRoomSensesLayout8.add(jLabel17, BorderLayout.NORTH);
         pnlRoomSensesLayout8.add(txtVisibleDefaultSense, BorderLayout.CENTER);
+        pnlRoomSensesLayout8.add(btnSenseDefaultVisibleEditor, BorderLayout.EAST);
         pnlRoomSensesLayout9.setLayout(borderLayout28);
         pnlRoomSensesLayout9.add(jLabel16, BorderLayout.NORTH);
         pnlRoomSensesLayout9.add(txtDefaultSense, BorderLayout.CENTER);
+        pnlRoomSensesLayout9.add(btnSenseDefaultEditor, BorderLayout.EAST);
         pnlRoomSensesLayout3.setLayout(borderLayout33);
         pnlRoomSensesLayout3.add(pnlRoomSensesLayout6, BorderLayout.NORTH);
         pnlRoomSensesLayout3.add(jLabel20, BorderLayout.SOUTH);
         pnlRoomSensesLayout4.setLayout(borderLayout29);
         pnlRoomSensesLayout4.add(pnlRoomSensesLayout9, BorderLayout.NORTH);
         pnlRoomSensesLayout4.add(pnlRoomSensesLayout8, BorderLayout.SOUTH);
+        jScrollPane5.getViewport().setPreferredSize(new Dimension(120, 200));
         jScrollPane5.getViewport().add(txtSenseDescription, null);
         pnlRoomSensesLayout5.setLayout(borderLayout31);
+        pnlRoomSensesLayout5.setBorder(borderRoom);
         pnlRoomSensesLayout5.add(pnlRoomSensesLayout7, BorderLayout.NORTH);
         pnlRoomSensesLayout5.add(pnlRoomSensesLayout10, BorderLayout.EAST);
         pnlRoomSensesLayout5.add(jScrollPane5, BorderLayout.CENTER);
@@ -792,7 +826,7 @@ public class RoomTabs extends JTabbedPane {
         pnlRoomSensesLayout1.setLayout(borderLayout34);
         pnlRoomSensesLayout1.add(pnlRoomSensesLayout3, BorderLayout.NORTH);
         pnlRoomSensesLayout1.add(jScrollPane6, BorderLayout.CENTER);
-        pnlRoomSensesLayout2.setBorder(borderInset5);
+        pnlRoomSensesLayout2.setBorder(borderRoom);
         pnlRoomSensesLayout2.setLayout(borderLayout32);
         pnlRoomSensesLayout2.add(pnlRoomSensesLayout5, BorderLayout.CENTER);
         pnlRoomSensesLayout2.add(pnlRoomSensesLayout4, BorderLayout.NORTH);
@@ -997,6 +1031,7 @@ public class RoomTabs extends JTabbedPane {
 
         // Add To Tabs
         setBorder(borderInset5);
+//        setTabLayoutPolicy(SCROLL_TAB_LAYOUT);
         add(pnlRoomBasics, "Basics");
         add(pnlRoomItems, "Items");
         add(pnlRoomMisc, "Miscellaneous");

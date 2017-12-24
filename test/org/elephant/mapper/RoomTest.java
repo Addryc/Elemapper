@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 public class RoomTest {
 
     @Test
-    public void testGetType() throws Exception {
+    public void testChangeMacros() throws Exception {
         String roomDesc = "You have arrived at something of a junction on Arcanist's Way. Ahead of you, the road continues towards the looming Tower of Ancients, while to your east a short walk takes you to what appears to be the entrance to the Sente House. Broad steps lead up to its entrance which appears to be open DAYCHANGE(despite it being night and there is nobody to be seen around|despite dawn only just having arrived|for the daily traffic of government|even though night is swiftly descending). Looking to your west there appears to be a park of some variety, with the road dwindling into a well trodden path through the grass, flanked on either side by well-tended trees.";
         System.out.println(roomDesc);
         System.out.println(Room.replaceMacros("TEST1", roomDesc));
@@ -23,6 +23,14 @@ public class RoomTest {
         System.out.println(roomDesc);
         System.out.println(Room.replaceMacros("TEST4", roomDesc));
 
+
+    }
+
+    @Test
+    public void testFnRegex() throws Exception {
+        String roomDesc = "(: query_fun() :)";
+        System.out.println(roomDesc);
+        System.out.println(Room.replaceMacros("TEST1", roomDesc));
 
     }
 }

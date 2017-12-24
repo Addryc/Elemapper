@@ -242,9 +242,9 @@ public class EleHashtable extends HashMap<String, String> implements Exportable 
             while (iter.hasNext()) {
                 key = iter.next();
 
-                bw.write("    "+type+"(\""+ key +"\", \"");
-                bw.write(get(key));
-                bw.write("\");\n");
+                bw.write("    "+type+"(\""+ key +"\", ");
+                bw.write(Room.replaceMacros(getType()+"-"+key, get(key),5));
+                bw.write(");\n");
             }
         }
     }

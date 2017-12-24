@@ -19,8 +19,6 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.*;
 
-import com.inet.jortho.FileUserDictionary;
-import com.inet.jortho.SpellChecker;
 import org.elephant.mapper.*;
 import org.elephant.mapper.helper.ExitHelper;
 import org.elephant.mapper.helper.RoomHelper;
@@ -174,8 +172,6 @@ public class EleFrame extends JFrame {
     public EleFrame() {
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
-        SpellChecker.setUserDictionaryProvider(new FileUserDictionary());
-        SpellChecker.registerDictionaries(EleConstants.class.getResource("/dictionary"), "en");
 
         try {
             jbInit();
@@ -221,7 +217,7 @@ public class EleFrame extends JFrame {
 
         // Set properties on this.
         setIconImage(Toolkit.getDefaultToolkit().createImage(ResourceLoader.load(_eleImage))); //todo Comment out for designer
-        setSize(new Dimension(586, 618));
+        setSize(new Dimension(700, 618));
         updateTitle();
 
         // Map stuff
@@ -833,7 +829,7 @@ public class EleFrame extends JFrame {
         separator2.setMaximumSize(new Dimension(3, 22));
         separator3.setOrientation(SwingConstants.VERTICAL);
         pnlProperties.setMinimumSize(new Dimension(500, 300));
-        pnlProperties.setPreferredSize(new Dimension(500, 300));
+        pnlProperties.setPreferredSize(new Dimension(640, 300));
 
         // Layout stuff
         // Main stuff
